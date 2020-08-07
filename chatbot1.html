@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chatbot</title>
+<style>
+body {
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+a {
+	color: rgb(128, 0, 128);
+}
+.container{
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+  align-items: center;
+  height: 100vh;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+	<div id="main">
+		<div>user: <span id="user"></span></div>
+		<div>chatbot: <span id="chatbot"></span></div>
+		<div><input id="input" type="text" placeholder="say anything..." autocomplete="off"/></div>
+	</div>
+</div>
+<script type="text/javascript">
+//customer speak
+var trigger = [
+	["hi","hey","hello"], 
+	["how do i track my order"],
+	["y"],
+	["no"],
+	["n"],
+	["yes"],
+	["who are you", "are you human", "are you bot", "are you human or bot"],
+	["who created you", "who made you"],
+	["your name please",  "your name", "may i know your name", "what is your name"],
+	["help me", "I need help", "help"],
+	["bye", "good bye", "goodbye", "see you later"]
+];
+
+//bot speak
+var homePageLink = '<a href="https://www.google.com/">here</a>';
+var trackingPageLink = '<a href="https://www.youtube.com/">here</a>';
+var contactLink = '<a href="https://www.amazon.co.uk/">here</a>';
+var reply = [
+    ["Hi how can I help?"], 
+	["Your orders can be tracked" + " " + trackingPageLink],
+	["Our contact details can be found" + " " +contactLink + ". Do you need anymore help? (Yes/No)"],
+	["Okay click" + " " + homePageLink + " to go back to our home page"],
+	["Okay, could you please reword your question."],
+	["Okay how can I help?"],
+	["I am just a bot", "I am a bot. What are you?"],
+	["May Showumi"],
+	["I am nameless", "I don't have a name"],
+	["How can I help?"],
+	["See you soon. To go back to our home page click" + " " + homePageLink + "."],
+];
+
+var alternative = ["Sorry... I do not understand, would you like to talk to a human? (Y/N)"];
+
+//when the enter key is pressed grab the data in the input field, then 
+document.querySelector("#input").addEventListener("keypress", function(e){ //e = event object
+	//make the variable key be equal to the the keycode of the key which was pressed
+	var key = e.which || e.keyCode;
+	if(key === 13){ //Enter button
+		var input = document.getElementById("input").value; //place the data input by customer in a variable
+		document.getElementById("user").innerHTML = input;
+		output(input); //run the output function using the data grabbed from the customer
+	}
+});
+
+function output(input){
+	try{
+		var product = input + "=" + eval(input);
+	} catch(e){
+		var text = (input.toLowerCase()).replace(/[^\w\s\d]/gi, ""); //remove all chars except words, space and 
+		text = text.replace(/ a /g, " ").replace(/i feel /g, "").replace(/whats/g, "what is").replace(/please /g, "").replace(/ please/g, "");
+		if(compare(trigger, reply, text)){
+			var product = compare(trigger, reply, text);
+		} else {
+			var product = alternative[Math.floor(Math.random()*alternative.length)];
+		}
+	}
+	document.getElementById("chatbot").innerHTML = product;
+	speak(product);
+	document.getElementById("input").value = ""; //clear input value
+}
+
+//compare both arrays with the string input by the customer (trigger array, reply array, text input)
+
+function compare(arr, array, string){ 
+	var item; //declare an item variable
+	for(var x=0; x<arr.length; x++){ //loop through the array
+		for(var y=0; y<array.length; y++){ //loop through the array within that array
+			if(arr[x][y] == string){ 
+				items = array[x];
+				item =  items[Math.floor(Math.random()*items.length)];
+			}
+		}
+	}
+	return item;
+}
+
+//Speak function
+function speak(string){
+	var utterance = new SpeechSynthesisUtterance();
+	utterance.voice = speechSynthesis.getVoices().filter(function(voice){return voice.name == "Agnes";})[0];
+	utterance.text = string;
+	utterance.lang = "en-US";
+	utterance.volume = 1; //0-1 interval
+	utterance.rate = 1;
+	utterance.pitch = 2; //0-2 interval
+	speechSynthesis.speak(utterance);
+}
+</script>
+</body>
+</html>
